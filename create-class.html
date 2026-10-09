@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Virtual Class</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Virtual Classroom</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="live-class.html">Live Classes</a>
+        </nav>
+    </header>
+
+    <main class="form-container">
+        <h2>Create a Virtual Class</h2>
+
+        <form id="classForm">
+            <label for="teacher">Teacher Name</label>
+            <input id="teacher" type="text" required>
+
+            <label for="className">Class Name</label>
+            <input id="className" type="text"
+                   placeholder="e.g. Python Programming" required>
+
+            <label for="date">Class Date</label>
+            <input id="date" type="date" required>
+
+            <label for="time">Class Time</label>
+            <input id="time" type="time" required>
+
+            <label for="meetingLink">Meeting Link (optional)</label>
+            <input id="meetingLink" type="url"
+                   placeholder="https://example.com/meeting">
+
+            <button type="submit">Create Class</button>
+            <p id="message"></p>
+        </form>
+
+        <p><a href="live-class.html">View Available Classes</a></p>
+    </main>
+
+    <script>
+        const form = document.getElementById("classForm");
+
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const classroom = {
+                id: Date.now(),
+                teacher: document.getElementById("teacher").value.trim(),
+                name: document.getElementById("className").value.trim(),
+                date: document.getElementById("date").value,
+                time: document.getElementById("time").value,
+                link: document.getElementById("meetingLink").value.trim()
+            };
+
+            const classes = JSON.parse(
+                localStorage.getItem("virtualClasses") || "[]"
+            );
+
+            classes.push(classroom);
+            localStorage.setItem("virtualClasses", JSON.stringify(classes));
+
+            document.getElementById("message").textContent =
+                "Class created successfully!";
+
+            form.reset();
+        });
+    </script>
+</body>
+</html>
