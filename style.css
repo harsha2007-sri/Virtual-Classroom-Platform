@@ -1,0 +1,125 @@
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f3f6fc;
+    color: #202b3c;
+}
+
+header {
+    background: #243b80;
+    color: white;
+    padding: 20px 7%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+nav {
+    display: flex;
+    gap: 20px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+}
+
+.hero {
+    text-align: center;
+    padding: 100px 20px;
+}
+
+.hero h2 {
+    font-size: 40px;
+    margin-bottom: 15px;
+}
+
+.hero p {
+    color: #586579;
+    margin-bottom: 30px;
+}
+
+.btn,
+button {
+    display: inline-block;
+    background: #3157c8;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 22px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.secondary {
+    background: #536579;
+}
+
+.form-container {
+    max-width: 430px;
+    margin: 45px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 18px #00000012;
+}
+
+.form-container h2 {
+    text-align: center;
+    margin-top: 0;
+}
+
+label {
+    display: block;
+    margin: 16px 0 7px;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #ccd3df;
+    border-radius: 5px;
+    font-size: 15px;
+}
+
+.form-container button {
+    width: 100%;
+    margin-top: 22px;
+}
+
+.form-container p {
+    text-align: center;
+    font-size: 14px;
+}
+
+#message {
+    color: #243b80;
+}
+
+@media (max-width: 500px) {
+    header {
+        flex-direction: column;
+    }
+
+    .hero h2 {
+        font-size: 30px;
+    }
+
+    .form-container {
+        margin: 25px 15px;
+    }
+}
