@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Announcements - Virtual Classroom</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Virtual Classroom</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="upload-notes.html">Notes</a>
+            <a href="discussion.html">Discussion</a>
+        </nav>
+    </header>
+
+    <main class="form-container">
+        <h2>Class Announcements</h2>
+        <p>Important updates from your classroom.</p>
+
+        <form id="announcementForm">
+            <label for="teacher">Teacher Name</label>
+            <input id="teacher" type="text" required>
+
+            <label for="title">Announcement Title</label>
+            <input id="title" type="text"
+                   placeholder="e.g. Exam Schedule" required>
+
+            <label for="content">Announcement Details</label>
+            <textarea id="content" rows="4"
+                      placeholder="Enter announcement details..."
+                      required></textarea>
+
+            <button type="submit">Publish Announcement</button>
+            <p id="message" role="status"></p>
+        </form>
+
+        <hr>
+        <h2>Latest Announcements</h2>
+        <div id="announcementList" aria-live="polite"></div>
+    </main>
+
+    <script>
+        const form = document.getElementById("announcementForm");
+        const announcementList =
+            document.getElementById("announcementList");
+
+        function getAnnouncements() {
+            try {
+                return JSON.parse(
+                    localStorage.getItem("classAnnouncements") || "[]"
+                );
+            } catch {
+                return [];
+            }
+        }
+
+        function displayAnnouncements() {
+            announcementList.replaceChildren();
+
+            const announcements = getAnnouncements();
+
+            if (announcements.length === 0) {
+                const empty = document.createElement("p");
+                empty.textContent = "No announcements have been published.";
+                announcementList.appendChild(empty);
+                return;
+            }
+
+            announcements.slice().reverse().forEach(function(item) {
+                const card = document.createElement("section");
+                card.style.border = "1px solid #ccd3df";
+                card.style.padding = "15px";
+                card.style.marginTop = "15px";
+                card.style.borderRadius = "8px";
+
+                const heading = document.createElement("h3");
+                heading.textContent = item.title;
+
+                const content = document.createElement("p");
+                content.textContent = item.content;
+
+                const teacher = document.createElement("p");
+                teacher.textContent = "Posted by: " + item.teacher;
+
+                const date = document.createElement("small");
+                date.textContent = "Published: " + item.date;
+
+                card.append(heading, content, teacher, date);
+                announcementList.appendChild(card);
+            });
+        }
+
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const announcements = getAnnouncements();
+
+            announcements.push({
+                id: Date.now(),
+                teacher: document.getElementById("teacher").value.trim(),
+                title: document.getElementById("title").value.trim(),
+                content: document.getElementById("content").value.trim(),
+                date: new Date().toLocaleString()
+            });
+
+            try {
+                localStorage.setItem(
+                    "classAnnouncements",
+                    JSON.stringify(announcements)
+                );
+
+                document.getElementById("message").textContent =
+                    "Announcement published successfully!";
+
+                form.reset();
+                displayAnnouncements();
+            } catch {
+                document.getElementById("message").textContent =
+                    "Unable to save announcement. Storage may be full.";
+            }
+        });
+
+        displayAnnouncements();
+    </script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discussion Forum - Virtual Classroom</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Virtual Classroom</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="upload-notes.html">Notes</a>
+            <a href="announcements.html">Announcements</a>
+        </nav>
+    </header>
+
+    <main class="form-container">
+        <h2>Discussion Forum</h2>
+        <p>Ask questions and discuss your doubts.</p>
+
+        <form id="questionForm">
+            <label for="role">Your Role</label>
+            <select id="role" required>
+                <option value="student">Student</option>
+                <option value="teacher">Teacher</option>
+            </select>
+
+            <label for="author">Your Name</label>
+            <input id="author" type="text" required>
+
+            <label for="question">Your Question or Message</label>
+            <textarea id="question" rows="4"
+                      placeholder="Write your question here..."
+                      required></textarea>
+
+            <button type="submit">Post Message</button>
+            <p id="message" role="status"></p>
+        </form>
+
+        <hr>
+        <h2>Questions and Replies</h2>
+        <div id="discussionList" aria-live="polite"></div>
+    </main>
+
+    <script>
+        const questionForm = document.getElementById("questionForm");
+        const discussionList = document.getElementById("discussionList");
+
+        function getPosts() {
+            try {
+                return JSON.parse(
+                    localStorage.getItem("classroomDiscussions") || "[]"
+                );
+            } catch {
+                return [];
+            }
+        }
+
+        function savePosts(posts) {
+            localStorage.setItem(
+                "classroomDiscussions",
+                JSON.stringify(posts)
+            );
+        }
+
+        questionForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const posts = getPosts();
+
+            posts.push({
+                id: Date.now(),
+                role: document.getElementById("role").value,
+                author: document.getElementById("author").value.trim(),
+                text: document.getElementById("question").value.trim(),
+                replies: []
+            });
+
+            try {
+                savePosts(posts);
+                document.getElementById("message").textContent =
+                    "Message posted successfully!";
+                questionForm.reset();
+                displayPosts();
+            } catch {
+                document.getElementById("message").textContent =
+                    "Unable to save the message. Browser storage may be full.";
+            }
+        });
+
+        function displayPosts() {
+            discussionList.replaceChildren();
+            const posts = getPosts();
+
+            if (posts.length === 0) {
+                const empty = document.createElement("p");
+                empty.textContent = "No discussions yet. Start one!";
+                discussionList.appendChild(empty);
+                return;
+            }
+
+            posts.forEach(function(post) {
+                const card = document.createElement("section");
+                card.style.border = "1px solid #ccd3df";
+                card.style.padding = "15px";
+                card.style.marginTop = "15px";
+                card.style.borderRadius = "8px";
+
+                const heading = document.createElement("h3");
+                heading.textContent =
+                    post.author + " (" + post.role + ")";
+
+                const text = document.createElement("p");
+                text.textContent = post.text;
+
+                card.append(heading, text);
+
+                (post.replies || []).forEach(function(reply) {
+                    const replyBox = document.createElement("p");
+                    replyBox.textContent =
+                        "Reply from " + reply.author + ": " + reply.text;
+                    replyBox.style.marginLeft = "15px";
+                    card.appendChild(replyBox);
+                });
+
+                const replyForm = document.createElement("form");
+
+                const replyInput = document.createElement("input");
+                replyInput.type = "text";
+                replyInput.placeholder = "Write a reply...";
+                replyInput.required = true;
+                replyInput.setAttribute("aria-label", "Reply message");
+
+                const nameInput = document.createElement("input");
+                nameInput.type = "text";
+                nameInput.placeholder = "Your name";
+                nameInput.required = true;
+                nameInput.setAttribute("aria-label", "Your name");
+
+                const roleSelect = document.createElement("select");
+                roleSelect.setAttribute("aria-label", "Replying as");
+
+                [
+                    ["teacher", "Teacher"],
+                    ["student", "Student"]
+                ].forEach(function(optionData) {
+                    const option = document.createElement("option");
+                    option.value = optionData[0];
+                    option.textContent = optionData[1];
+                    roleSelect.appendChild(option);
+                });
+
+                const replyButton = document.createElement("button");
+                replyButton.type = "submit";
+                replyButton.textContent = "Reply";
+
+                replyForm.append(nameInput, roleSelect, replyInput, replyButton);
+
+                replyForm.addEventListener("submit", function(event) {
+                    event.preventDefault();
+
+                    const currentPosts = getPosts();
+                    const currentPost = currentPosts.find(
+                        item => item.id === post.id
+                    );
+
+                    if (!currentPost) return;
+
+                    currentPost.replies = currentPost.replies || [];
+                    currentPost.replies.push({
+                        author: nameInput.value.trim(),
+                        role: roleSelect.value,
+                        text: replyInput.value.trim()
+                    });
+
+                    try {
+                        savePosts(currentPosts);
+                        displayPosts();
+                    } catch {
+                        alert("Unable to save reply. Storage may be full.");
+                    }
+                });
+
+                card.appendChild(replyForm);
+                discussionList.appendChild(card);
+            });
+        }
+
+        displayPosts();
+    </script>
+</body>
+</html>
