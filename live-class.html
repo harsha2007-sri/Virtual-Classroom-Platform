@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Live Classes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Virtual Classroom</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="create-class.html">Create Class</a>
+        </nav>
+    </header>
+
+    <main class="form-container">
+        <h2>Available Live Classes</h2>
+        <div id="classList"></div>
+    </main>
+
+    <script>
+        function displayClasses() {
+            const container = document.getElementById("classList");
+            const classes = JSON.parse(
+                localStorage.getItem("virtualClasses") || "[]"
+            );
+
+            container.replaceChildren();
+
+            if (classes.length === 0) {
+                container.textContent = "No classes available yet.";
+                return;
+            }
+
+            classes.forEach(function(classroom) {
+                const card = document.createElement("section");
+                card.style.border = "1px solid #ccd3df";
+                card.style.padding = "15px";
+                card.style.marginBottom = "15px";
+                card.style.borderRadius = "8px";
+
+                const title = document.createElement("h3");
+                title.textContent = classroom.name;
+
+                const teacher = document.createElement("p");
+                teacher.textContent = "Teacher: " + classroom.teacher;
+
+                const dateTime = document.createElement("p");
+                dateTime.textContent =
+                    "Date: " + classroom.date +
+                    " | Time: " + classroom.time;
+
+                card.append(title, teacher, dateTime);
+
+                if (classroom.link) {
+                    const join = document.createElement("a");
+                    join.href = classroom.link;
+                    join.target = "_blank";
+                    join.rel = "noopener noreferrer";
+                    join.textContent = "Join Class";
+                    join.className = "btn";
+                    card.appendChild(join);
+                } else {
+                    const note = document.createElement("p");
+                    note.textContent =
+                        "No meeting link has been added yet.";
+                    card.appendChild(note);
+                }
+
+                container.appendChild(card);
+            });
+        }
+
+        displayClasses();
+    </script>
+</body>
+</html>
