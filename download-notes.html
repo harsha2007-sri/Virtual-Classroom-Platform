@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Notes - Virtual Classroom</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Virtual Classroom</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="upload-notes.html">Upload Notes</a>
+            <a href="discussion.html">Discussion</a>
+            <a href="announcements.html">Announcements</a>
+        </nav>
+    </header>
+
+    <main class="form-container">
+        <h2>Study Materials</h2>
+        <p>Browse and download available notes.</p>
+
+        <button type="button" id="refreshButton">Refresh Notes</button>
+        <div id="notesList" aria-live="polite"></div>
+    </main>
+
+    <script>
+        const notesList = document.getElementById("notesList");
+
+        function displayNotes() {
+            notesList.replaceChildren();
+
+            let notes;
+
+            try {
+                notes = JSON.parse(
+                    localStorage.getItem("classroomNotes") || "[]"
+                );
+            } catch {
+                notes = [];
+            }
+
+            if (notes.length === 0) {
+                const empty = document.createElement("p");
+                empty.textContent = "No study notes available yet.";
+                notesList.appendChild(empty);
+                return;
+            }
+
+            notes.forEach(function(note) {
+                const card = document.createElement("section");
+                card.style.border = "1px solid #ccd3df";
+                card.style.padding = "15px";
+                card.style.marginTop = "15px";
+                card.style.borderRadius = "8px";
+
+                const heading = document.createElement("h3");
+                heading.textContent = note.title;
+
+                const subject = document.createElement("p");
+                subject.textContent = "Subject: " + note.subject;
+
+                const fileName = document.createElement("p");
+                fileName.textContent = "File: " + note.fileName;
+
+                const download = document.createElement("a");
+                download.href = note.fileData;
+                download.download = note.fileName;
+                download.textContent = "Download Notes";
+                download.className = "btn";
+
+                card.append(heading, subject, fileName, download);
+                notesList.appendChild(card);
+            });
+        }
+
+        document.getElementById("refreshButton")
+            .addEventListener("click", displayNotes);
+
+        displayNotes();
+    </script>
+</body>
+</html>

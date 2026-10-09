@@ -1,0 +1,104 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Notes - Virtual Classroom</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Virtual Classroom</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="download-notes.html">View Notes</a>
+            <a href="discussion.html">Discussion</a>
+            <a href="announcements.html">Announcements</a>
+        </nav>
+    </header>
+
+    <main class="form-container">
+        <h2>Upload Study Notes</h2>
+        <p>Share study materials with your students.</p>
+
+        <form id="uploadForm">
+            <label for="title">Notes Title</label>
+            <input id="title" type="text"
+                   placeholder="e.g. Python Unit 1 Notes" required>
+
+            <label for="subject">Subject</label>
+            <input id="subject" type="text"
+                   placeholder="e.g. Python Programming" required>
+
+            <label for="notesFile">Select File (maximum 1 MB)</label>
+            <input id="notesFile" type="file" required>
+
+            <button type="submit">Upload Notes</button>
+            <p id="message" role="status"></p>
+        </form>
+
+        <p><a href="download-notes.html">Go to Download Notes</a></p>
+    </main>
+
+    <script>
+        const form = document.getElementById("uploadForm");
+
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const title = document.getElementById("title").value.trim();
+            const subject = document.getElementById("subject").value.trim();
+            const file = document.getElementById("notesFile").files[0];
+            const message = document.getElementById("message");
+
+            if (!file) {
+                message.textContent = "Please select a file.";
+                return;
+            }
+
+            if (file.size > 1024 * 1024) {
+                message.textContent =
+                    "File is too large. Please select a file under 1 MB.";
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function() {
+                try {
+                    const notes = JSON.parse(
+                        localStorage.getItem("classroomNotes") || "[]"
+                    );
+
+                    notes.push({
+                        id: Date.now(),
+                        title: title,
+                        subject: subject,
+                        fileName: file.name,
+                        fileType: file.type || "application/octet-stream",
+                        fileData: reader.result
+                    });
+
+                    localStorage.setItem(
+                        "classroomNotes",
+                        JSON.stringify(notes)
+                    );
+
+                    message.textContent = "Notes uploaded successfully!";
+                    form.reset();
+                } catch (error) {
+                    message.textContent =
+                        "Browser storage is full. Try a smaller file.";
+                }
+            };
+
+            reader.onerror = function() {
+                message.textContent = "Unable to read this file.";
+            };
+
+            reader.readAsDataURL(file);
+        });
+    </script>
+</body>
+</html>
